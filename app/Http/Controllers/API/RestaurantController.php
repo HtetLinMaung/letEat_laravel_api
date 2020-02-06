@@ -110,7 +110,6 @@ class RestaurantController extends Controller
     public function destroy(Restaurant $restaurant)
     {
         $temp = $restaurant;
-        $restaurant->phones()->update(['restaurant_id' => null]);
         $restaurant->delete();
         return ['message' => 'Deleted successfully', 'data' => $temp];
     }
