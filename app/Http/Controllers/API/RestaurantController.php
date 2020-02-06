@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Restaurant;
+use App\RestaurantsPhone;
+use Exception;
 
 class RestaurantController extends Controller
 {
@@ -15,18 +17,26 @@ class RestaurantController extends Controller
      */
     public function index()
     {
-        $restaurants = Restaurant::all();
+        try {
+            $restaurants = Restaurant::all();
 
-        if (empty($restaurants)) {
-            return [
-                'message' => 'Successful',
-                'data' => $restaurants
-            ];
-        } else {
-            return response()->json([
-                'message' => 'Date is empty',
-                'data' => $restaurants
-            ], 400);
+            foreach ($restaurants as $restaurant) {
+                $restaurant['phones'] = $restaurant->phones;
+            }
+
+            if (!empty($restaurants)) {
+                return [
+                    'message' => 'Successful',
+                    'data' => $restaurants
+                ];
+            } else {
+                return response()->json([
+                    'message' => 'Date is empty',
+                    'data' => $restaurants
+                ], 400);
+            }
+        } catch (Exception $e) {
+            return response()->json(['message' => "Something went wrong!", 'data' => []], 500);
         }
     }
 
@@ -38,14 +48,34 @@ class RestaurantController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->only(['name', 'description', 'location', 'image']);
+        try {
+            $restaurant = Restaurant::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'location' => $request->location,
+                'image' => $request->image
+            ]);
 
-        $restaurant = Restaurant::create($input);
+            $phones = $request->input('phone_no');
 
-        return [
-            'message' => 'Successful',
-            'data' => $restaurant
-        ];
+            $temp = [];
+            foreach ($phones as $phone_no) {
+                $temp[] = [
+                    'phone_no' => $phone_no,
+                    'restaurant_id' => $restaurant->id
+                ];
+            }
+
+            $restaurant->phones()->createMany($temp);
+            $restaurant['phones'] = $restaurant->phones;
+
+            return [
+                'message' => 'Successful',
+                'data' => $restaurant
+            ];
+        } catch (Exception $e) {
+            return response()->json(['message' => "Something went wrong!", 'data' => []], 500);
+        }
     }
 
     /**
@@ -77,8 +107,11 @@ class RestaurantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Restaurant $restaurant)
     {
-        //
+        $temp = $restaurant;
+        $restaurant->phones()->update(['restaurant_id' => null]);
+        $restaurant->delete();
+        return ['message' => 'Deleted successfully', 'data' => $temp];
     }
 }

@@ -16,7 +16,7 @@ class CreateRestaurantsPhonesTable extends Migration
         Schema::create('restaurants_phones', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('phone_no');
-            $table->unsignedBigInteger('restaurant_id');
+            $table->unsignedBigInteger('restaurant_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

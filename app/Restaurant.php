@@ -11,6 +11,6 @@ class Restaurant extends Model
     protected $guarded = [];
 
     public function phones() {
-        $this->hasMany('App\RestaurantsPhone');
+        return $this->hasMany('App\RestaurantsPhone');
     }
 }
