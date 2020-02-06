@@ -17,7 +17,17 @@ class RestaurantController extends Controller
     {
         $restaurants = Restaurant::all();
 
-        return $restaurants;
+        if (empty($restaurants)) {
+            return [
+                'message' => 'Successful',
+                'data' => $restaurants
+            ];
+        } else {
+            return response()->json([
+                'message' => 'Date is empty',
+                'data' => $restaurants
+            ], 400);
+        }
     }
 
     /**
@@ -28,11 +38,14 @@ class RestaurantController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->only(['name', 'description', 'location']);
+        $input = $request->only(['name', 'description', 'location', 'image']);
 
         $restaurant = Restaurant::create($input);
 
-        return $restaurant;
+        return [
+            'message' => 'Successful',
+            'data' => $restaurant
+        ];
     }
 
     /**
