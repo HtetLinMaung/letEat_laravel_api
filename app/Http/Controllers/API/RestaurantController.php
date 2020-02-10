@@ -67,14 +67,12 @@ class RestaurantController extends Controller
             }
 
             $restaurant->phones()->createMany($temp);
-            $restaurant['phones'] = $restaurant->phones;
 
             return [
                 'message' => 'Successful',
-                'data' => $restaurant
             ];
         } catch (Exception $e) {
-            return response()->json(['message' => "Something went wrong!", 'data' => []], 500);
+            return response()->json(['message' => "Something went wrong!"], 500);
         }
     }
 
@@ -84,9 +82,15 @@ class RestaurantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Restaurant $restaurant)
     {
-        //
+        try {
+            $restaurant['phones'] = $restaurant->phones;
+
+            return ['message' => 'Successful', 'data' => $restaurant];
+        } catch (Exception $e) {
+            return response()->json(['message' => "Something went wrong!"], 500);
+        }
     }
 
     /**
@@ -96,9 +100,36 @@ class RestaurantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Restaurant $restaurant)
     {
-        //
+        try {
+            $restaurant->update([
+                'name' => $request->name,
+                'description' => $request->description,
+                'location' => $request->location,
+                'image' => $request->image
+            ]);
+
+            foreach ($restaurant->phones as $phone) {
+                $phone->delete();
+            }
+
+            $phones = $request->input('phone_no');
+
+            $temp = [];
+            foreach ($phones as $phone_no) {
+                $temp[] = [
+                    'phone_no' => $phone_no,
+                    'restaurant_id' => $restaurant->id
+                ];
+            }
+
+            $restaurant->phones()->createMany($temp);
+
+            return ['message' => 'Updated successful'];
+        } catch (Exception $e) {
+            return response()->json(['message' => "Something went wrong!"], 500);
+        }
     }
 
     /**
