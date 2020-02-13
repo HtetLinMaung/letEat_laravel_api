@@ -9,4 +9,8 @@ class Menu extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
+
+    public function restaurants() {
+        return $this->belongsToMany('App\Restaurant');
+    }
 }

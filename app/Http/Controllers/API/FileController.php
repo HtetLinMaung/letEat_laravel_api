@@ -10,7 +10,7 @@ class FileController extends Controller
 {
     public function store(Request $request)
     {
-        $path = $request->file('image')->store('public/image');
+        $path = $request->file('image')->store('image');
 
         return url('storage/' . $path);
     }

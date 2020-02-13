@@ -18,4 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('restaurants', 'API\RestaurantController');
+Route::resource('menus', 'API\MenuController');
 Route::post('uploadSingleFile', 'API\FileController@store');

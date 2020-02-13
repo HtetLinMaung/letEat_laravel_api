@@ -140,8 +140,11 @@ class RestaurantController extends Controller
      */
     public function destroy(Restaurant $restaurant)
     {
-        $temp = $restaurant;
-        $restaurant->delete();
-        return ['message' => 'Deleted successfully', 'data' => $temp];
+        try {
+            $restaurant->delete();
+            return ['message' => 'Deleted successfully'];
+        } catch (Exception $e) {
+            return response()->json(['message' => "Something went wrong!"], 500);
+        }
     }
 }
